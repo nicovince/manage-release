@@ -100,3 +100,16 @@ echo "MESSAGE=${MESSAGE}"
 echo "BODY=${BODY}"
 echo "PRERELEASE=${PRERELEASE}"
 echo "DRAFT=${DRAFT}"
+
+if [ "$#" -eq 0 ]; then
+    echo "Missing files to add to release"
+    exit 1
+fi
+
+for f in "${POSITIONAL_ARGS[@]}"; do
+    echo "${f}"
+    if [ ! -f "${f}" ]; then
+        echo "${f} does not exist"
+        exit 1
+    fi
+done
