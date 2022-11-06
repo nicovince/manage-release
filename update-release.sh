@@ -8,6 +8,43 @@ BODY=""
 PRERELEASE=1
 DRAFT=0
 
+function delete_old_release()
+{
+    local release_name="$1"
+
+    release_list="$(gh api repos/{owner}/{repo}/releases -q '.[] | .["tag_name"]')"
+    echo "Found releases: ${release_list}"
+    if [ ! -z "${release_list}" ]; then
+        match=$(echo "${release_list}" | grep "^${release_name}$")
+        if [ "${match}" = "${release_name}" ]; then
+            echo "Delete relase ${release_name}"
+            gh release delete --yes --cleanup-tag "${release_name}"
+        fi
+    fi
+}
+
+function create_release()
+{
+    local release_name="$1"
+    local tag="$2"
+    local message="$3"
+    local body="$4"
+    local prerelease="$5"
+    local draft="$6"
+    local opts=""
+
+    if [ "${prerelease}" -eq 1 ]; then
+        opts="${opts} --prerelease"
+    fi
+
+    if [ "${draft}" -eq 1 ]; then
+        opts="${opts} --draft"
+    fi
+    echo "Creating release with:"
+    echo "gh release create --title \"${release_name}\" --notes \"${body}\" ${opts} ${tag}"
+    gh release create --title "${release_name}" --notes "${body}" ${opts} ${tag}
+}
+
 function help()
 {
     script_name="$(basename $0)"
@@ -94,6 +131,19 @@ done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
 echo "POSITIONAL_ARGS=${POSITIONNAL_ARGS[@]}"
+
+if [ -z "${RELEASE_NAME}" ]; then
+    RELEASE_NAME="$(git rev-parse --abbrev-ref HEAD)"
+fi
+
+if [ -z "${TAG}" ]; then
+    TAG="${RELEASE_NAME}"
+fi
+
+if [ -z ${MESSAGE} ]; then
+    MESSAGE="${RELEASE_NAME} latest release"
+fi
+
 echo "RELEASE_NAME=${RELEASE_NAME}"
 echo "TAG=${TAG}"
 echo "MESSAGE=${MESSAGE}"
@@ -107,9 +157,15 @@ if [ "$#" -eq 0 ]; then
 fi
 
 for f in "${POSITIONAL_ARGS[@]}"; do
-    echo "${f}"
     if [ ! -f "${f}" ]; then
         echo "${f} does not exist"
         exit 1
     fi
 done
+
+# check gh is logged, this command returns a non-zero exit code when not logged in.
+gh auth status
+
+delete_old_release "${RELEASE_NAME}"
+
+create_release "${RELEASE_NAME}" "${TAG}" "${MESSAGE}" "${BODY}" "${PRERELEASE}" "${DRAFT}"
