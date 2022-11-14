@@ -1,0 +1,138 @@
+digraph G {
+  node [fontname = "Handlee"];
+  edge [fontname = "Handlee"];
+  run [
+    shape = rect;
+    label = "Run Script";
+    group = vert_grp;
+  ]
+  arg_relname [
+    shape = diamond;
+    label = "release name provided ?";
+    group = vert_grp;
+  ]
+  def_relname [
+    shape = rect;
+    label = "release name = current branch name";
+  ]
+  {
+    rank = same;
+    arg_relname; def_relname;
+  }
+  arg_tag [
+    shape = diamond;
+    label = "tag provided ?";
+    group = vert_grp;
+  ]
+  def_tag [
+    shape = rect;
+    label = "tag name = release name";
+  ]
+  {
+    rank = same;
+    arg_tag; def_tag;
+  }
+  arg_sha1 [
+    shape = diamond;
+    label = "sha1 provided ?";
+    group = vert_grp;
+  ]
+  tag_exists [
+    shape = diamond;
+    label = "Tag exists ?";
+  ]
+  sha1_head [
+    shape = rect;
+    label = "sha1 = HEAD";
+  ]
+  sha1_tag [
+    shape = rect;
+    label = "sha1 = tag's sha1";
+  ]
+  {
+    rank  = same;
+    arg_sha1; tag_exists; sha1_head;
+  }
+  rel_exists [
+    shape = diamond;
+    label = "Release exists ?";
+    group = vert_grp;
+  ]
+  rel_on_tag [
+    shape = diamond;
+    label = "Release on tag ?";
+  ]
+  tag_on_sha1 [
+    shape = diamond;
+    label = "Tag on sha1 ?";
+  ]
+  delete_release [
+    shape = rect;
+    label = "Delete release";
+    group = REL;
+  ]
+  {
+    rank = same
+    rel_exists; rel_on_tag; err_rel_on_other_tag;
+  }
+  err_rel_on_other_tag [
+    shape = rect;
+    label = "Error: Do not delete release on other tag";
+  ]
+  create_release [
+    shape = rect;
+    label = "Create release";
+    group = REL;
+  ]
+  upload_assets [
+    shape = rect;
+    label = "Upload assets to release";
+  ]
+  {
+    rank = same;
+    create_release; upload_assets;
+  }
+  no_rel_tag_exists [
+    shape = diamond;
+    label = "Tag exists ?";
+    group = vert_grp;
+  ]
+  no_rel_tag_on_sha1 [
+    shape = diamond;
+    label = "Tag on sha1 ?";
+  ]
+  err_tag_on_other_sha1 [
+    shape = rect;
+    label = "Error: Do not modify existing tag on other sha1."
+  ]
+  {
+    rank = same;
+    no_rel_tag_exists; no_rel_tag_on_sha1; err_tag_on_other_sha1;
+  }
+
+  run -> arg_relname;
+  arg_relname -> def_relname [ label = "no" ];
+  arg_relname -> arg_tag [ label = "yes" ];
+  def_relname -> arg_tag;
+  arg_tag -> def_tag [ label = "no" ];
+  arg_tag -> arg_sha1 [ label = "yes" ];
+  def_tag -> arg_sha1;
+  arg_sha1 -> tag_exists [ label = "no "];
+  arg_sha1 -> rel_exists [ label = "yes "];
+  tag_exists -> sha1_head [ label = "no" ];
+  tag_exists -> sha1_tag [ label = "yes" ];
+  sha1_head -> rel_exists;
+  sha1_tag -> rel_exists;
+  rel_exists -> rel_on_tag [ label = "yes" ];
+  rel_on_tag -> tag_on_sha1 [ label = "yes" ];
+  tag_on_sha1 -> upload_assets [ label = "yes" ];
+  tag_on_sha1 -> delete_release [ label = "no" ];
+  rel_on_tag -> err_rel_on_other_tag [ label = "no" ];
+  delete_release -> create_release;
+  create_release -> upload_assets;
+  rel_exists -> no_rel_tag_exists [ label = "no" ];
+  no_rel_tag_exists -> no_rel_tag_on_sha1 [ label = "yes" ];
+  no_rel_tag_exists -> create_release [ label = "no" ];
+  no_rel_tag_on_sha1 -> err_tag_on_other_sha1 [ label = "no" ];
+  no_rel_tag_on_sha1 -> create_release [ label = "yes" ];
+}
