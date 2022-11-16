@@ -1,0 +1,59 @@
+name: 'Update Release'
+description: 'Create or Update release with provided assets files. This action tries to be compatible with johnwbyrd/update-release'
+author: 'Nicolas VINCENT'
+inputs:
+  token:
+    #description: 'Your Github token; try \$\{\{ secrets.GITHUB_TOKEN \}\} if your build lasts less than an hour, or create your own secret token with repository access if your build requires longer than an hour.'
+    #required: true
+  files:
+    description: 'Paths to built files to be released. May be absolute or relative to \$\{\{ github.workspace \}\}.'
+    required: true
+  release:
+    description: 'The name of the release to be created. A reasonable looking release name will be created from the current \$\{\{ github.ref \}\} if this input is not supplied.'
+    required: false
+  tag:
+    description: 'The name of the tag to be used. If not provided, the name of the release will be used.'
+    required: false
+  message:
+    description: 'A one-line description for both the tag and the release.'
+    required: false
+  body:
+    description: 'A fuller description of the release.'
+    required: false
+  prerelease:
+    description: 'Should the release, if created, be marked as a prerelease?  Such releases are generally publicly visible.'
+    default: true
+  draft:
+    description: 'Should the release, if created, be marked as a draft?  Such releases are generally not publicly visible.'
+    default: false
+outputs:
+  files:
+    description: 'The calculated path(s) to the files that were released.'
+  draft:
+    description: 'Whether the release, if created, was marked as a draft.'
+  prerelease:
+    description: 'Whether the release, if created, was marked as a prerelease.'
+  release:
+    description: 'The calculated human-friendly name of the release.'
+  tag:
+    description: 'The calculated tag for the release.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Files check
+      shell: bash
+      run: |
+        echo "## Checking files" >> $GITHUB_STEP_SUMMARY
+        STEP_FAILED=0
+        for f in ${{ inputs.files }}; do
+          if [ ! -f ${f} ]; then
+            STEP_FAILED=1
+            echo "- ${f} does not exist" >> ${GITHUB_STEP_SUMMARY}
+          fi
+        done
+        if [ "${STEP_FAILED}" -eq 0 ]; then
+          echo "All files requested for releases are available" >> ${GITHUB_STEP_SUMMARY}
+        fi
+branding:
+  icon: wind
+  color: blue
