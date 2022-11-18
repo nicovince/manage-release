@@ -72,8 +72,8 @@ runs:
         else
           echo "sha1_arg= " >> $GITHUB_OUTPUT
         fi
-        echo "message_arg=--message ${{ inputs.message }}"
-        echo "body_arg=--body ${{ inputs.body }}"
+        echo "message_arg=--message ${{ inputs.message }}" >> $GITHUB_OUTPUT
+        echo "body_arg=--body ${{ inputs.body }}" >> $GITHUB_OUTPUT
         if [ "${{ inputs.prerelease }}" = "true" ]; then
           echo "release_arg=--release" >> $GITHUB_OUTPUT
         else
@@ -88,4 +88,4 @@ runs:
     - name: Run Script
       shell: bash
       run: |
-        ./manage-release.sh ${{ steps.get_args.release_name_arg }} ${{ steps.get_args.tag_arg }} ${{ steps.get_arg.sha1_arg }} ${{ steps.get_args.message_arg }} ${{ steps.get_args.body_arg }} ${{ steps.get_args.release_arg }} ${{ steps.get_args.draft_arg }} ${{ inputs.files }}
+        ./manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get_arg.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} ${{ inputs.files }}
