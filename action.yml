@@ -2,9 +2,6 @@ name: 'Update Release'
 description: 'Create or Update release with provided assets files. This action tries to be compatible with johnwbyrd/update-release'
 author: 'Nicolas VINCENT'
 inputs:
-  token:
-    #description: 'Your Github token; try \$\{\{ secrets.GITHUB_TOKEN \}\} if your build lasts less than an hour, or create your own secret token with repository access if your build requires longer than an hour.'
-    #required: true
   files:
     description: 'Paths to built files to be released. May be absolute or relative to \$\{\{ github.workspace \}\}.'
     required: true
@@ -54,6 +51,41 @@ runs:
         if [ "${STEP_FAILED}" -eq 0 ]; then
           echo "All files requested for releases are available" >> ${GITHUB_STEP_SUMMARY}
         fi
-branding:
-  icon: wind
-  color: blue
+
+    - name: Get Script Arguments
+      shell: bash
+      id: get-args
+      run: |
+        if [ -z "${{ inputs.release }}" ]; then
+          release=$(echo ${{ github.ref }} | sed 's#refs/heads/##')
+        else
+          release=${{ inputs.release }}
+        fi
+        echo "release_name_arg=--release-name ${release}" >> $GITHUB_OUTPUT
+        if [ -n "${{ inputs.tag }}" ]; then
+          echo "tag_arg=--tag ${{ inputs.tag }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag_arg= " >> $GITHUB_OUTPUT
+        fi
+        if [ -n "${{ inputs.sha1 }}" ]; then
+          echo "sha1_arg=--sha1 ${{ inputs.sha1 }}" >> $GITHUB_OUTPUT
+        else
+          echo "sha1_arg= " >> $GITHUB_OUTPUT
+        fi
+        echo "message_arg=--message ${{ inputs.message }}"
+        echo "body_arg=--body ${{ inputs.body }}"
+        if [ "${{ inputs.prerelease }}" = "true" ]; then
+          echo "release_arg=--release" >> $GITHUB_OUTPUT
+        else
+          echo "release_arg= " >> $GITHUB_OUTPUT
+        fi
+        if [ "${{ inputs.draft }}" = "true" ]; then
+          echo "draft_arg=--draft" >> $GITHUB_OUTPUT
+        else
+          echo "draft_arg= " >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run Script
+      shell: bash
+      run: |
+        ./manage-release.sh ${{ steps.get_args.release_name_arg }} ${{ steps.get_args.tag_arg }} ${{ steps.get_arg.sha1_arg }} ${{ steps.get_args.message_arg }} ${{ steps.get_args.body_arg }} ${{ steps.get_args.release_arg }} ${{ steps.get_args.draft_arg }} ${{ inputs.files }}
