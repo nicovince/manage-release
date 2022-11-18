@@ -72,8 +72,16 @@ runs:
         else
           echo "sha1_arg= " >> $GITHUB_OUTPUT
         fi
-        echo "message_arg=--message ${{ inputs.message }}" >> $GITHUB_OUTPUT
-        echo "body_arg=--body ${{ inputs.body }}" >> $GITHUB_OUTPUT
+        if [ -n "${{ inputs.message }}" ]; then
+          echo "message_arg=--message ${{ inputs.message }}" >> $GITHUB_OUTPUT
+        else
+          echo "message_arg= " >> $GITHUB_OUTPUT
+        fi
+        if [ -n "${{ inputs.body }}" ]; then
+          echo "body_arg=--body ${{ inputs.body }}" >> $GITHUB_OUTPUT
+        else
+          echo "body_arg= " >> $GITHUB_OUTPUT
+        fi
         if [ "${{ inputs.prerelease }}" = "true" ]; then
           echo "release_arg=--release" >> $GITHUB_OUTPUT
         else
