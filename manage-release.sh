@@ -265,6 +265,7 @@ done
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
 
+set -x
 git tag --list
 git branch
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
