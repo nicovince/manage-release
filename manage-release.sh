@@ -265,6 +265,7 @@ done
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
 
+set -x
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "${TAG}")"
