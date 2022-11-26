@@ -99,4 +99,4 @@ runs:
     - name: Run Script
       shell: bash
       run: |
-        ${{ github.action_path }}/manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get_arg.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} ${{ inputs.files }}
+        ${{ github.action_path }}/manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get-arg.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} ${{ inputs.files }}
