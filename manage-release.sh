@@ -266,6 +266,8 @@ done
 gh auth status
 
 set -x
+git tag --list
+git branch
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "${TAG}")"
