@@ -265,7 +265,6 @@ done
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
 
-set -x
 git tag --list
 git branch
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
@@ -274,6 +273,7 @@ if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
         if [ "${tag_sha1}" = "${SHA1}" ]; then
             log "Update existing release"
         else
+            git tag --delete
             delete_release "${RELEASE_NAME}"
             create_release "${RELEASE_NAME}" "${TAG}" "${MESSAGE}" "${BODY}" "${PRERELEASE}" "${DRAFT}" "${SHA1}"
         fi
