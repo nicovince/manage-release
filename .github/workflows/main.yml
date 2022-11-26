@@ -9,8 +9,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release
-        uses: nicovince/manage-release@762b2f71d52209a4332e539f112996852db23891
+        uses: nicovince/manage-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: manage-release.sh
+          sha1: ${{ github.sha }}

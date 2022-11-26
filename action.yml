@@ -11,6 +11,9 @@ inputs:
   tag:
     description: 'The name of the tag to be used. If not provided, the name of the release will be used.'
     required: false
+  sha1:
+    description: 'SHA1 where the tag of the release must be set, use SHA1 of tag if not provided'
+    required: false
   message:
     description: 'A one-line description for both the tag and the release.'
     required: false
