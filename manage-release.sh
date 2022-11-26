@@ -270,7 +270,7 @@ git tag --list
 git branch
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
-        tag_sha1="$(get_sha1 "${TAG}")"
+        tag_sha1="$(get_sha1 "tags/${TAG}")"
         if [ "${tag_sha1}" = "${SHA1}" ]; then
             log "Update existing release"
         else
@@ -284,7 +284,7 @@ if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     fi
 else
     if [ "$(tag_exists "${TAG}")" -eq 1 ]; then
-        tag_sha1="$(get_sha1 "${TAG}")"
+        tag_sha1="$(get_sha1 "tags/${TAG}")"
         if [ "${tag_sha1}" = "${SHA1}" ]; then
             create_release "${RELEASE_NAME}" "${TAG}" "${MESSAGE}" "${BODY}" "${PRERELEASE}" "${DRAFT}" "${SHA1}"
         else
