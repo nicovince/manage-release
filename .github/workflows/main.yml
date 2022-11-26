@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release
-        uses: nicovince/manage-release@main
+        uses: nicovince/manage-release@5d1847082acfddc2a4d3ef70e9566bbd3e531dc7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
