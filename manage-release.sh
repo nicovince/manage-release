@@ -274,7 +274,7 @@ if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
         if [ "${tag_sha1}" = "${SHA1}" ]; then
             log "Update existing release"
         else
-            git tag --delete
+            git tag --delete "${TAG}"
             delete_release "${RELEASE_NAME}"
             create_release "${RELEASE_NAME}" "${TAG}" "${MESSAGE}" "${BODY}" "${PRERELEASE}" "${DRAFT}" "${SHA1}"
         fi
