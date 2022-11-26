@@ -107,6 +107,7 @@ function create_release()
     fi
     log "Create release ${release_name} on ${tag} at ${sha1}"
     gh release create --title "${release_name}" --notes "${body}" ${opts} ${tag}
+    git fetch
 }
 
 function upload_assets()
