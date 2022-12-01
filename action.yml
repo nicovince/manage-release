@@ -60,9 +60,9 @@ runs:
       id: get-args
       run: |
         if [ -z "${{ inputs.release }}" ]; then
-          release=$(echo ${{ github.ref }} | sed 's#refs/heads/##')
+          release="${{ github.ref_name }}"
         else
-          release=${{ inputs.release }}
+          release="${{ inputs.release }}"
         fi
         echo "release_name_arg=--release-name ${release}" >> $GITHUB_OUTPUT
         if [ -n "${{ inputs.tag }}" ]; then
