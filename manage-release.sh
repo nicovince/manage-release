@@ -106,7 +106,7 @@ function create_release()
         opts="${opts} --draft"
     fi
     log "Create release ${release_name} on ${tag} at ${sha1}"
-    gh release create --title "${release_name}" --notes "${body}" ${opts} ${tag}
+    gh release create --target "${sha1}" --title "${release_name}" --notes "${body}" ${opts} ${tag}
     git fetch
 }
 
