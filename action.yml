@@ -64,7 +64,7 @@ runs:
         else
           release="${{ inputs.release }}"
         fi
-        echo "release_name_arg=--release-name ${release}" >> $GITHUB_OUTPUT
+        echo "release_name_arg=--release-name '${release}'" >> $GITHUB_OUTPUT
         if [ -n "${{ inputs.tag }}" ]; then
           echo "tag_arg=--tag ${{ inputs.tag }}" >> $GITHUB_OUTPUT
         else
