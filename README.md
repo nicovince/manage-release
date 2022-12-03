@@ -36,12 +36,66 @@ jobs:
 ### Create release on pushed tag
 This workflow creates a release when a tag is pushed to the repository.
 
-TODO
+```yaml
+name: Release Creation on Tag
+on:
+  push:
+    tags: [ '*' ]
+
+jobs:
+  release_on_tag:
+    runs-on: ubuntu-latest
+    name: Release Creation on Tag Push
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Release
+        uses: nicovince/manage-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: <list of files>
+          tag: ${{ github.ref_name }}
+          body: "Creation of release after ${{ github.ref_name }} tag has been pushed to repository."
+```
 
 ### Update release on creation
 This workflow update a release that has been manually created (web interface, github API, ...)
 
-TODO
+```yaml
+name: Upload Artifacts on Release Creation
+on:
+  release:
+    types: [created]
+
+jobs:
+  upload_on_release:
+    runs-on: ubuntu-latest
+    name: Upload artifacts when Release is Created
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Release Name
+        id: get-rel-name
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "release_name=$(gh release view ${{ github.ref_name }} --json 'name' -q '.[]')" >> $GITHUB_OUTPUT
+
+      - name: Update Release
+        uses: nicovince/manage-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: <list of files>
+          release: ${{ steps.get-rel-name.outputs.release_name }}
+          tag: ${{ github.ref_name }}
+```
 
 ## Manual invocation
 The script `manage-release.sh` can be invoked manually, it relies on `gh` tool to create or update the release depending on the options passed.
