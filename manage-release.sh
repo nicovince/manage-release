@@ -8,10 +8,19 @@ MESSAGE=""
 BODY=""
 PRERELEASE=1
 DRAFT=0
+STEP_SUMMARY=""
+
+function log_md()
+{
+    if [ -n "${STEP_SUMMARY}" ]; then
+        echo "$1" >> "${STEP_SUMMARY}"
+    fi
+}
 
 function log()
 {
     echo "$1" >&2
+    log_md "$1"
 }
 
 function release_exist()
@@ -20,7 +29,12 @@ function release_exist()
     local ret="0"
 
     release_list="$(gh api repos/{owner}/{repo}/releases -q '.[] | .["name"]')"
-    log "Found releases: ${release_list}"
+    log "Found releases:"
+    for rel in ${release_list}; do
+        log "- ${rel}"
+    done
+    log_md ""
+
     if [ ! -z "${release_list}" ]; then
         match=$(echo "${release_list}" | grep "^${release_name}$")
         if [ "${match}" = "${release_name}" ]; then
@@ -199,6 +213,11 @@ while [[ $# -gt 0 ]]; do
       DRAFT=1
       shift
       ;;
+  --step-summary)
+      STEP_SUMMARY="$2"
+      shift
+      shift
+      ;;
     -*|--*)
       echo "Unknown option $1"
       exit 1
@@ -212,7 +231,7 @@ done
 
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-echo "POSITIONAL_ARGS=${POSITIONNAL_ARGS[@]}"
+log_md "## Manage Release"
 
 if [ -z "${RELEASE_NAME}" ]; then
     RELEASE_NAME="$(git rev-parse --abbrev-ref HEAD | sed 's#heads/##')"
@@ -249,6 +268,7 @@ echo "MESSAGE=${MESSAGE}"
 echo "BODY=${BODY}"
 echo "PRERELEASE=${PRERELEASE}"
 echo "DRAFT=${DRAFT}"
+echo "STEP_SUMMARY=${STEP_SUMMARY}"
 
 
 if [ "$#" -eq 0 ]; then
@@ -266,8 +286,6 @@ done
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
 
-git tag --list
-git branch
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "tags/${TAG}")"
