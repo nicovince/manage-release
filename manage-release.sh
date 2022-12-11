@@ -131,13 +131,10 @@ function wait_release()
     local ret="0"
 
     for i in $(seq 5); do
-        release_list="$(gh api repos/{owner}/{repo}/releases -q '.[] | .["name"]')"
-        if [ ! -z "${release_list}" ]; then
-            match=$(echo "${release_list}" | grep "^${release_name}$")
-            if [ "${match}" = "${release_name}" ]; then
-                log "Release ${release_name} created properly"
-                return
-            fi
+        api_resp="$(gh api repos/{owner}/{repo}/releases -q ".[] | select(.name == \"${release_name}\")")"
+        if [ -n "${api_resp}" ]; then
+            log "Release ${release_name} created properly."
+            return
         fi
         log "Release ${release_name} not available yet, wait a little bit..."
         sleep 3
