@@ -93,6 +93,30 @@ function get_sha1()
     echo "$(git log -1 --pretty=format:%H ${ref})"
 }
 
+function get_release_body()
+{
+    local release_name="$1"
+
+    gh api repos/{owner}/{repo}/releases -q ".[] | select(.name == \"${release_name}\") | .[\"body\"]"
+}
+
+function build_rolling_release_body()
+{
+    local body="$1"
+    local release_name="$2"
+    local tag="$3"
+    local prev_sha1="$(get_sha1 ${tag})"
+    local prev_body
+
+    if [ -n "${body}" ]; then
+        echo "${body}"
+    else
+        prev_body="$(get_release_body "${release_name}")"
+        echo "Rolling release, previous iteration at ${prev_sha1}"
+        echo "${prev_body}"
+    fi
+}
+
 function delete_release()
 {
     local release_name="$1"
@@ -257,10 +281,6 @@ if [ -z "${MESSAGE}" ]; then
     MESSAGE="${RELEASE_NAME} latest release"
 fi
 
-if [ -z "${BODY}" ]; then
-    BODY="${RELEASE_NAME} latest release"
-fi
-
 echo "RELEASE_NAME=${RELEASE_NAME}"
 echo "TAG=${TAG}"
 echo "SHA1=${SHA1}"
@@ -290,8 +310,10 @@ if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "tags/${TAG}")"
         if [ "${tag_sha1}" = "${SHA1}" ]; then
-            log "Update existing release"
+            log "Update existing release with artefacts from $(get_sha1 "HEAD")"
         else
+            log "Rolling release from $(get_sha1 "${TAG}") to $(get_sha1 "HEAD")"
+            BODY="$(build_rolling_release_body "${BODY}" "${RELEASE_NAME}" "${TAG}")"
             git tag --delete "${TAG}"
             delete_release "${RELEASE_NAME}"
             create_release "${RELEASE_NAME}" "${TAG}" "${MESSAGE}" "${BODY}" "${PRERELEASE}" "${DRAFT}" "${SHA1}"
@@ -301,6 +323,10 @@ if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
         exit 1
     fi
 else
+    if [ -z "${BODY}" ]; then
+        BODY="${RELEASE_NAME} latest release"
+    fi
+
     if [ "$(tag_exists "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "tags/${TAG}")"
         if [ "${tag_sha1}" = "${SHA1}" ]; then
