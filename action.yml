@@ -40,21 +40,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Files check
-      shell: bash
-      run: |
-        echo "## Checking files" >> $GITHUB_STEP_SUMMARY
-        STEP_FAILED=0
-        for f in ${{ inputs.files }}; do
-          if [ ! -f ${f} ]; then
-            STEP_FAILED=1
-            echo "- ${f} does not exist" >> ${GITHUB_STEP_SUMMARY}
-          fi
-        done
-        if [ "${STEP_FAILED}" -eq 0 ]; then
-          echo "All files requested for releases are available" >> ${GITHUB_STEP_SUMMARY}
-        fi
-
     - name: Get Script Arguments
       shell: bash
       id: get-args

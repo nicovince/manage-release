@@ -291,17 +291,26 @@ echo "DRAFT=${DRAFT}"
 echo "STEP_SUMMARY=${STEP_SUMMARY}"
 
 
+log_md "## Checking Files"
 if [ "$#" -eq 0 ]; then
     log "Missing files to add to release"
     exit 1
 fi
 
+file_error=0
 for f in "${POSITIONAL_ARGS[@]}"; do
     if [ ! -f "${f}" ]; then
-        echo "${f} does not exist"
-        exit 1
+         log "- ${f} does not exist"
+         file_error=1
+    else
+        log "- ${f} available"
     fi
 done
+log_md ""
+if [ "${file_error}" -eq 1 ]; then
+    log "Abort due to missing file(s)"
+    exit 1
+fi
 
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
