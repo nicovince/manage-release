@@ -125,6 +125,27 @@ function delete_release()
     gh release delete --yes --cleanup-tag "${release_name}"
 }
 
+function wait_release()
+{
+    local release_name="$1"
+    local ret="0"
+
+    for i in $(seq 5); do
+        release_list="$(gh api repos/{owner}/{repo}/releases -q '.[] | .["name"]')"
+        if [ ! -z "${release_list}" ]; then
+            match=$(echo "${release_list}" | grep "^${release_name}$")
+            if [ "${match}" = "${release_name}" ]; then
+                log "Release ${release_name} created properly"
+                return
+            fi
+        fi
+        log "Release ${release_name} not available yet, wait a little bit..."
+        sleep 3
+    done
+    log "Timeout while waiting for release ${release_name} to be available."
+    exit 1
+}
+
 function create_release()
 {
     local release_name="$1"
@@ -145,7 +166,7 @@ function create_release()
     fi
     log "Create release ${release_name} on ${tag} at ${sha1}"
     gh release create --target "${sha1}" --title "${release_name}" --notes "${body}" ${opts} ${tag}
-    git fetch
+    wait_release "${release_name}"
 }
 
 function upload_assets()
