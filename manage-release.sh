@@ -18,6 +18,7 @@ function output_var()
 
     if [ -n "${STEP_OUTPUT}" ]; then
         echo "${varname}=${value}" >> "${STEP_OUTPUT}"
+        echo "${varname}=${value}"
     fi
 }
 function log_md()
