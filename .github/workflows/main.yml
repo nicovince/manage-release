@@ -13,9 +13,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Release
+        id: release
         uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: manage-release.sh
           sha1: ${{ github.sha }}
+      - name: Show Outputs
+        run: |
+          echo "release: ${{ steps.release.outputs.release }}"
+          echo "tag: ${{ steps.release.outputs.tag }}"
