@@ -291,7 +291,7 @@ echo "DRAFT=${DRAFT}"
 echo "STEP_SUMMARY=${STEP_SUMMARY}"
 
 
-log_md "## Checking Files"
+log_md "### Checking Files"
 if [ "$#" -eq 0 ]; then
     log "Missing files to add to release"
     exit 1
@@ -315,6 +315,7 @@ fi
 # check gh is logged, this command returns a non-zero exit code when not logged in.
 gh auth status
 
+log_md "### Create/Update Release"
 if [ "$(release_exist "${RELEASE_NAME}")" -eq "1" ]; then
     if [ "$(is_release_on_tag "${RELEASE_NAME}" "${TAG}")" -eq 1 ]; then
         tag_sha1="$(get_sha1 "tags/${TAG}")"
