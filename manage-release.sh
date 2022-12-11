@@ -9,7 +9,17 @@ BODY=""
 PRERELEASE=1
 DRAFT=0
 STEP_SUMMARY=""
+STEP_OUTPUT=""
 
+function output_var()
+{
+    local varname="$1"
+    local value="$2"
+
+    if [ -n "${STEP_OUTPUT}" ]; then
+        echo "${varname}=${value}" >> "${STEP_OUTPUT}"
+    fi
+}
 function log_md()
 {
     if [ -n "${STEP_SUMMARY}" ]; then
@@ -164,6 +174,8 @@ function create_release()
     log "Create release ${release_name} on ${tag} at ${sha1}"
     gh release create --target "${sha1}" --title "${release_name}" --notes "${body}" ${opts} ${tag}
     wait_release "${release_name}"
+    output_var "tag" "${tag}"
+    output_var "release" "${release_name}"
 }
 
 function upload_assets()
@@ -185,6 +197,8 @@ function help()
     options="${options} [-b|--body <body>]"
     options="${options} [-r|--release]"
     options="${options} [-d|--draft]"
+    options="${options} [--step-summary]"
+    options="${options} [--step-output]"
 
     echo "Usage ${script_name} ${options} <FILE1 FILE2 ...>"
     echo ""
@@ -213,61 +227,72 @@ function help()
     echo ""
     echo "  -d, --draft"
     echo "    Mark the release as a draft."
+    echo ""
+    echo "  --step-summary"
+    echo "    File where Github markdodwn summary is written to."
+    echo ""
+    echo "  --step-output"
+    echo "    File where Github outputs variables are written to."
 }
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -h|--help)
-      shift
-      help
-      exit 0
-      ;;
-  -n|--release-name)
-      RELEASE_NAME="$2"
-      shift
-      shift
-      ;;
-  -t|--tag)
-      TAG="$2"
-      shift
-      shift
-      ;;
-  -s|--sha1)
-      SHA1="$2"
-      shift
-      shift
-      ;;
-  -m|--message)
-      MESSAGE="$2"
-      shift
-      shift
-      ;;
-  -b|--body)
-      BODY="$2"
-      shift
-      shift
-      ;;
-  -r|--release)
-      PRERELEASE=0
-      shift
-      ;;
-  -d|--draft)
-      DRAFT=1
-      shift
-      ;;
-  --step-summary)
-      STEP_SUMMARY="$2"
-      shift
-      shift
-      ;;
-    -*|--*)
-      echo "Unknown option $1"
-      exit 1
-      ;;
-    *)
-      POSITIONAL_ARGS+=("$1") # save positional arg
-      shift # past argument
-      ;;
+      -h|--help)
+          shift
+          help
+          exit 0
+          ;;
+      -n|--release-name)
+          RELEASE_NAME="$2"
+          shift
+          shift
+          ;;
+      -t|--tag)
+          TAG="$2"
+          shift
+          shift
+          ;;
+      -s|--sha1)
+          SHA1="$2"
+          shift
+          shift
+          ;;
+      -m|--message)
+          MESSAGE="$2"
+          shift
+          shift
+          ;;
+      -b|--body)
+          BODY="$2"
+          shift
+          shift
+          ;;
+      -r|--release)
+          PRERELEASE=0
+          shift
+          ;;
+      -d|--draft)
+          DRAFT=1
+          shift
+          ;;
+      --step-summary)
+          STEP_SUMMARY="$2"
+          shift
+          shift
+          ;;
+      --step-output)
+          STEP_OUTPUT="$2"
+          shift
+          shift
+          ;;
+      -*|--*)
+          echo "Unknown option $1"
+          exit 1
+          ;;
+      *)
+          POSITIONAL_ARGS+=("$1") # save positional arg
+          shift # past argument
+          ;;
   esac
 done
 

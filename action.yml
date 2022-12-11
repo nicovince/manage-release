@@ -27,12 +27,6 @@ inputs:
     description: 'Should the release, if created, be marked as a draft?  Such releases are generally not publicly visible.'
     default: false
 outputs:
-  files:
-    description: 'The calculated path(s) to the files that were released.'
-  draft:
-    description: 'Whether the release, if created, was marked as a draft.'
-  prerelease:
-    description: 'Whether the release, if created, was marked as a prerelease.'
   release:
     description: 'The calculated human-friendly name of the release.'
   tag:
@@ -84,4 +78,4 @@ runs:
     - name: Run Script
       shell: bash
       run: |
-        ${{ github.action_path }}/manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get-args.outputs.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} --step-summary "${GITHUB_STEP_SUMMARY}" ${{ inputs.files }}
+        ${{ github.action_path }}/manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get-args.outputs.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} --step-summary "${GITHUB_STEP_SUMMARY}" ${{ inputs.files }} --step-output "${GITHUB_OUTPUT}"
