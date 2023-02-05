@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Release
-        uses: nicovince/manage-release@main
+        uses: nicovince/manage-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -50,7 +50,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Release
-        uses: nicovince/manage-release@main
+        uses: nicovince/manage-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -86,7 +86,7 @@ jobs:
           echo "release_name=$(gh release view ${{ github.ref_name }} --json 'name' -q '.[]')" >> $GITHUB_OUTPUT
 
       - name: Update Release
-        uses: nicovince/manage-release@main
+        uses: nicovince/manage-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

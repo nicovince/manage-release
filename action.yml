@@ -1,4 +1,4 @@
-name: 'Update Release'
+name: 'Manage Release'
 description: 'Create or Update release with provided assets files. This action tries to be compatible with johnwbyrd/update-release'
 author: 'Nicolas VINCENT'
 inputs:
@@ -82,3 +82,7 @@ runs:
       id: script
       run: |
         ${{ github.action_path }}/manage-release.sh ${{ steps.get-args.outputs.release_name_arg }} ${{ steps.get-args.outputs.tag_arg }} ${{ steps.get-args.outputs.sha1_arg }} ${{ steps.get-args.outputs.message_arg }} ${{ steps.get-args.outputs.body_arg }} ${{ steps.get-args.outputs.release_arg }} ${{ steps.get-args.outputs.draft_arg }} --step-summary "${GITHUB_STEP_SUMMARY}" ${{ inputs.files }} --step-output "${GITHUB_OUTPUT}"
+
+branding:
+  icon: 'briefcase'
+  color: 'blue'
